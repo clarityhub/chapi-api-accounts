@@ -1,0 +1,39 @@
+documentation:
+  get:
+    operationId: organizationsGet
+    summary: "Get your Organizations"
+    description: "Get a list of organizations you have access to"
+    tags:
+      - "organizations"
+    security:
+      - IamAuth: []
+    responses:
+      "200":
+        description: List of organizations
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationsGetResponse'
+  post:
+    operationId: organizationsPost
+    summary: "Create an Organization"
+    description: "Create a new Organization"
+    tags:
+      - "organizations"
+    security:
+      - IamAuth: []
+    requestBody:
+      description: >-
+        Create a new organization
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OrganizationsCreateRequest'
+    responses:
+      "200":
+        description: Organization
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationsGetResponse'

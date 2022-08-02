@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+npm install --no-progress > /dev/null
+
+source ./fixtures/deploy/variables/local.sh
+
+serverless dynamodb install
+SLS_DEBUG=* sls offline start --exec "npm run test:integration"
+
+echo $?

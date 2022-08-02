@@ -1,0 +1,42 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "Access Keys Response",
+    "required": [
+        "status",
+        "items"
+    ],
+    "properties": {
+        "items": {
+            "type": "array",
+            "title": "List of Access Keys",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "accessKeyId": {
+                        "type": "string"
+                    },
+                    "organizationId": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "creatorUserId": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "modifiedAt": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

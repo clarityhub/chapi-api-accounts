@@ -1,0 +1,51 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "Create an Access Key Response",
+    "properties": {
+        "item": {
+            "type": "object",
+            "title": "Item",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "Access Key Name",
+                    "default": "",
+                    "pattern": "^(.*)$"
+                },
+                "description": {
+                    "type": "string",
+                    "title": "Access Key Description",
+                    "default": "",
+                    "pattern": "^(.*)$"
+                },
+                "accessKeyId": {
+                    "type": "string",
+                    "title": "Access Key Id",
+                    "default": "",
+                    "pattern": "^(.*)$"
+                },
+                "accessKeySecret": {
+                    "type": "string",
+                    "title": "Access Key Secret",
+                    "default": "",
+                    "pattern": "^(.*)$"
+                },
+                "organizationId": {
+                    "type": "string"
+                },
+                "creatorUserId": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "modifiedAt": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

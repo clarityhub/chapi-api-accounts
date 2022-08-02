@@ -1,0 +1,16 @@
+documentation:
+  get:
+    operationId: accessKeyTest
+    summary: Test your Access Keys
+    description: >-
+      Test that you are calling the API correctly with your Access Key ID and
+      Access Key Secret
+    tags:
+      - accessKeys
+    responses:
+      '200':
+        description: Status and list of services
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthResponse'

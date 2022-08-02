@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+npm install --no-progress > /dev/null
+
+source ./fixtures/deploy/variables/local.sh
+
+serverless dynamodb install
+npm run docs:build
+SLS_DEBUG=* serverless offline start --host=0.0.0.0 --stage local

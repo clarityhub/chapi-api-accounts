@@ -1,0 +1,113 @@
+image: node:12.13.0
+
+# Required Env Vars
+#
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+# - AWS_DEFAULT_REGION
+#
+
+stages:
+  - pre
+  - test
+  - build
+  - infra
+  - deploy
+
+cache:
+  paths:
+    - node_modules
+
+### =====================
+### Pre (Setup)
+### =====================
+
+install:
+  stage: pre
+  before_script:
+    - node -v
+    - npm -v
+  script:
+    - npm i
+
+### =====================
+### Linting
+### =====================
+
+lint:
+  stage: test
+  cache:
+    policy: pull
+  except:
+    - tags
+    - teardown
+  only:
+    changes:
+      - src/**/*
+  before_script:
+    - npm i
+  script:
+    - npm run lint
+  
+### =====================
+### Tests
+### =====================
+
+test:
+  stage: test
+  cache:
+    policy: pull
+  except:
+    - tags
+    - teardown
+  only:
+    changes:
+      - src/**/*
+  before_script:
+    - npm i
+  script:
+    - npm run test
+
+### =====================
+### Serverless Deployment
+### =====================
+
+deploy_dev_serverless:
+  image:
+    name: registry.gitlab.com/clarityhub/clarityhub-api-accounts/serverless:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  stage: deploy
+  only:
+    - master
+  cache:
+    policy: pull
+  variables:
+    ENVIRONMENT: "development"
+  before_script:
+    - sh ./fixtures/deploy/utilities/credentials.sh
+    - npm i
+  script:
+    - sh ./fixtures/deploy/build-docs.sh
+    - sh ./fixtures/deploy/deploy-serverless.sh
+
+deploy_prod_serverless:
+  image:
+    name: registry.gitlab.com/clarityhub/clarityhub-api-accounts/serverless:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  stage: deploy
+  only:
+    - tags
+  cache:
+    policy: pull
+  variables:
+    ENVIRONMENT: "production"
+  before_script:
+    - sh ./fixtures/deploy/utilities/credentials.sh
+    - npm i
+  script:
+    - sh ./fixtures/deploy/build-docs.sh
+    - sh ./fixtures/deploy/deploy-serverless.sh

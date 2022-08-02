@@ -1,0 +1,68 @@
+documentation:
+  parameters:
+    - in: path
+      name: accessKeyId
+      required: true
+      schema:
+        type: string
+      description: The access key id
+
+  get:
+    summary: "Get an Access Key by its accessKeyId"
+    description: >-
+      Get an Access Key details by its accessKeyId. This will not
+      return the `accessKeySecret`.
+    tags:
+      - "accessKeys"
+    security:
+      - IamAuth: []
+    parameters:
+      - $ref: '#/components/parameters/organization'
+    responses:
+      "200":
+        description: Access Key
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessKeyGetResponse'
+  put:
+    summary: "Update an Access Key"
+    description: >-
+      Update the details of an Access Key
+    tags:
+      - "accessKeys"
+    security:
+      - IamAuth: []
+    parameters:
+      - $ref: '#/components/parameters/organization'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccessKeyUpdateRequest'
+    responses:
+      "200":
+        description: Access Key
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessKeyGetResponse'
+  delete:
+    summary: "Delete an Access Key"
+    description: >-
+      Delete an Access Key. This will immediately make the access key
+      unusable.
+    tags:
+      - "accessKeys"
+    security:
+      - IamAuth: []
+    parameters:
+      - $ref: '#/components/parameters/organization'
+    responses:
+      "200":
+        description: Access Key
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessKeyGetResponse'

@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  version: "1"
+  title: "Clarity Hub Account Service API"
+  description: "This API handles account information, including: organizations, users, and access keys"
+components:
+  parameters:
+    organization:
+      in: header
+      name: X-Clarityhub-Organization
+      schema:
+        type: string
+        format: uuid
+      required: true
+  schemas:
+    HealthResponse: 
+      $ref: ../schemas/healthResponse.json
+    AccessKeysGetResponse:
+      $ref: ../schemas/accessKeysGetResponse.json
+    AccessKeyCreateRequest:
+      $ref: ../schemas/accessKeyCreateRequest.json
+    AccessKeyCreateResponse:
+      $ref: ../schemas/accessKeyCreateResponse.json
+    AccessKeyGetResponse:
+      $ref: ../schemas/accessKeyGetResponse.json
+    AccessKeyUpdateRequest:
+      $ref: ../schemas/accessKeyUpdateRequest.json
+    OrganizationsGetResponse:
+      $ref: ../schemas/organizationsGetResponse.json
+    OrganizationsCreateRequest:
+      $ref: ../schemas/organizationCreateRequest.json
+  securitySchemes:
+    AWSAuth:
+      name: X-Amz-Security-Token
+      type: apiKey
+      in: header
+    BearerAuth:
+      type: http
+      scheme: bearer
+paths:
+  "/health":
+    $ref: ./health.yml#/documentation
+  "/access-keys":
+    $ref: ./accessKeys.yml#/documentation
+  "/access-keys/{accessKeyId}":
+    $ref: ./accessKey.yml#/documentation
+  "/access-keys/test":
+    $ref: ./accessKeyTest.yml#/documentation
+  "/organizations":
+    $ref: ./organizations.yml#/documentation

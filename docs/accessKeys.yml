@@ -1,0 +1,46 @@
+documentation:
+  get:
+    operationId: accessKeysGet
+    summary: "Get your Access Keys"
+    description: "Get a list of access keys for an organization you have access to"
+    tags:
+      - "accessKeys"
+    security:
+      - IamAuth: []
+    parameters:
+      - $ref: '#/components/parameters/organization'
+    responses:
+      "200":
+        description: List of access keys
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessKeysGetResponse'
+  post:
+    operationId: accessKeysPost
+    summary: "Create an Access Key"
+    description: "Create a new Access Key Pair"
+    tags:
+      - "accessKeys"
+    security:
+      - IamAuth: []
+    parameters:
+      - $ref: '#/components/parameters/organization'
+    requestBody:
+      description: >-
+        Required post body for creating an access key.
+
+        This is the **only** time that the `accessKeySecret` will be
+        returned.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccessKeyCreateRequest'
+    responses:
+      "200":
+        description: Access Key
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessKeyCreateResponse'

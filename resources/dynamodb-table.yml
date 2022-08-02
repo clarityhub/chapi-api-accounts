@@ -1,0 +1,100 @@
+Resources:
+  OrganizationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.organizationsTableName}
+      AttributeDefinitions:
+        - AttributeName: organizationId
+          AttributeType: S
+        - AttributeName: organizationName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: organizationId
+          KeyType: HASH
+        - AttributeName: organizationName
+          KeyType: RANGE
+      # Set the capacity based on the stage
+      # ProvisionedThroughput:
+      #   ReadCapacityUnits: ${self:custom.tableThroughput}
+      #   WriteCapacityUnits: ${self:custom.tableThroughput}
+      BillingMode: PAY_PER_REQUEST
+  
+  OrganizationUsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.organizationUsersTableName}
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: organizationId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: organizationId
+          KeyType: RANGE
+      # Set the capacity based on the stage
+      # ProvisionedThroughput:
+      #   ReadCapacityUnits: ${self:custom.tableThroughput}
+      #   WriteCapacityUnits: ${self:custom.tableThroughput}
+      BillingMode: PAY_PER_REQUEST
+
+  OrganizationAccessKeysTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.organizationAccessKeysTableName}
+      AttributeDefinitions:
+        - AttributeName: accessKeyId
+          AttributeType: S
+        - AttributeName: organizationId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: organizationId
+          KeyType: HASH
+        - AttributeName: accessKeyId
+          KeyType: RANGE
+      # Set the capacity based on the stage
+      # ProvisionedThroughput:
+      #   ReadCapacityUnits: ${self:custom.tableThroughput}
+      #   WriteCapacityUnits: ${self:custom.tableThroughput}
+      BillingMode: PAY_PER_REQUEST
+
+  AccessKeysTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.accessKeysTableName}
+      AttributeDefinitions:
+        - AttributeName: accessKeyId
+          AttributeType: S
+        - AttributeName: organizationId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: accessKeyId
+          KeyType: HASH
+        - AttributeName: organizationId
+          KeyType: RANGE
+      # Set the capacity based on the stage
+      # ProvisionedThroughput:
+      #   ReadCapacityUnits: ${self:custom.tableThroughput}
+      #   WriteCapacityUnits: ${self:custom.tableThroughput}
+      BillingMode: PAY_PER_REQUEST
+
+  REportTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.reportTableName}
+      AttributeDefinitions:
+        - AttributeName: organizationId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: N
+      KeySchema:
+        - AttributeName: organizationId
+          KeyType: HASH
+        - AttributeName: createdAt
+          KeyType: RANGE
+      # Set the capacity based on the stage
+      # ProvisionedThroughput:
+      #   ReadCapacityUnits: ${self:custom.tableThroughput}
+      #   WriteCapacityUnits: ${self:custom.tableThroughput}
+      BillingMode: PAY_PER_REQUEST

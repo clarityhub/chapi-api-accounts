@@ -1,0 +1,250 @@
+service: clarityhub-api-accounts
+# frameworkVersion: "=1.41.1"
+
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
+  # - serverless-domain-manager
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  organizationsTableName: ${self:custom.stage}-organizations
+  organizationUsersTableName: ${self:custom.stage}-organizationUsers
+  organizationAccessKeysTableName: ${self:custom.stage}-organizationAccessKeys
+  accessKeysTableName: ${self:custom.stage}-accessKeys
+  reportTableName: ${self:custom.stage}-report
+  bugsnagApiKey: 
+  userPoolId:
+    local: 
+    development:
+    production:
+  webpack:
+    webpackConfig: ./configs/webpack.config.js
+    includeModules: true
+  dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      migrate: true
+  serverless-offline:
+    port: 4000
+  cors:
+    origin: '*'
+    headers:
+      - Content-Type
+      - X-Amz-Date
+      - Authorization
+      - X-Api-Key
+      - X-Amz-Security-Token
+      - X-Amz-User-Agent
+      - X-ClarityHub-Organization
+    allowCredentials: false
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'local'}
+  region: ${env:AWS_REGION, 'us-west-2'}
+  memorySize: 512
+  timeout: 7
+  environment:
+    organizationsTableName: ${self:custom.organizationsTableName}
+    organizationUsersTableName: ${self:custom.organizationUsersTableName}
+    organizationAccessKeysTableName: ${self:custom.organizationAccessKeysTableName}
+    accessKeysTableName: ${self:custom.accessKeysTableName}
+    reportTableName: ${self:custom.reportTableName}
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    USER_POOL_ID: ${self:custom.userPoolId.${self:custom.stage}}
+    BUGSNAG_API_KEY: ${self:custom.bugsnagApiKey}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:ListTables
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-west-2:*:*"
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminGetUser
+      Resource: "arn:aws:cognito-idp:us-west-2:*:*"
+
+package:
+  include:
+    - docs/**
+    - schemas/**
+
+functions:
+  # ===== Authorizors =====
+  accessKeyAuthorizer:
+    handler: src/routes/accessKeyAuthorizer.default
+  
+  bearerAuthorizer:
+    handler: src/routes/bearerAuthorizer.default
+    environment:
+      STAGE: ${self:provider.stage}
+      REGION: ${self:provider.region}
+      USER_POOL_ID: ${self:custom.userPoolId.${self:custom.stage}}
+
+  # ===== Health Endpoint =====
+  health:
+    handler: src/routes/health.default
+    events:
+      - http:
+          path: health
+          method: GET
+
+  # ===== Public Swagger Endpoint =====
+  swagger:
+    handler: src/routes/swagger.default
+    events:
+      - http:
+          path: swagger
+          method: GET
+          cors: true
+
+  # ===== Report Endpoint =====
+  report:
+    handler: src/routes/reportUsage.default
+    events:
+      - http:
+          path: report/usage
+          method: POST
+
+  # ===== Access Keys =====
+  accessKeyTest:
+    handler: src/routes/accessKeyTest.default
+    events:
+      - http:
+          path: access-keys/test
+          method: GET
+          cors: ${self:custom.cors}
+          authorizer:
+            name: accessKeyAuthorizer
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: request
+      - http:
+          # Note the web prefix
+          path: web/access-keys/test
+          method: GET
+          cors: ${self:custom.cors}
+          authorizer:
+            name: bearerAuthorizer
+            resultTtlInSeconds: 10
+            identitySource: method.request.header.Authorization, method.request.header.X-Clarityhub-Organization
+            type: request
+
+  accessKeysGet:
+    handler: src/routes/accessKeys.getAll
+    events:
+      - http:
+          path: access-keys
+          method: get
+          cors: ${self:custom.cors}
+          authorizer: aws_iam
+
+  accessKeyGet:
+    handler: src/routes/accessKeys.get
+    events:
+      - http:
+          path: access-keys/{accessKeyId}
+          method: get
+          cors: ${self:custom.cors}
+          authorizer: aws_iam
+          request:
+            parameters:
+              paths:
+                accessKeyId: true
+
+  accessKeyCreate:
+    handler: src/routes/accessKeys.create
+    events:
+      - http:
+          path: access-keys
+          method: post
+          cors: ${self:custom.cors}
+          authorizer: aws_iam
+          request:
+            schema:
+              application/json: ${file(./schemas/accessKeyCreateRequest.json)}
+    
+  accessKeyEdit:
+    handler: src/routes/accessKeys.edit
+    events:
+      - http:
+          path: access-keys/{accessKeyId}
+          method: put
+          cors: ${self:custom.cors}
+          authorizer: aws_iam
+          request:
+            parameters:
+              paths:
+                accessKeyId: true
+            schema:
+              application/json: ${file(./schemas/accessKeyEditRequest.json)}
+    
+  accessKeyDelete:
+    handler: src/routes/accessKeys.del
+    events:
+      - http:
+          path: access-keys/{accessKeyId}
+          method: delete
+          cors: ${self:custom.cors}
+          authorizer: aws_iam
+          request:
+            parameters:
+              paths:
+                accessKeyId: true
+
+  # ===== Organizations =====
+  organizationsGet:
+    handler: src/routes/organizations.getAll
+    events:
+      - http:
+          path: organizations
+          method: get
+          cors: ${self:custom.cors}
+          authorizer: aws_iam
+
+  organizationsCreate:
+    handler: src/routes/organizations.create
+    events:
+      - http:
+          path: organizations
+          method: post
+          cors: ${self:custom.cors}
+          authorizer: aws_iam
+          request:
+              schema:
+                application/json: ${file(./schemas/organizationCreateRequest.json)}
+
+  organizationsLeave:
+    handler: src/routes/organizations.leave
+    events:
+      - http:
+          path: organizations/{organizationId}/actions/leave
+          method: post
+          cors: ${self:custom.cors}
+          authorizer: aws_iam
+          request:
+              parameters:
+                paths:
+                  organizationId: true
+
+resources:
+  # API Gateway Errors
+  - ${file(resources/api-gateway-errors.yml)}
+  # DynamoDB
+  - ${file(resources/dynamodb-table.yml)}
+  # Cognito
+  - ${file(resources/cognito-user-pool.yml)}
+  - ${file(resources/cognito-identity-pool.yml)}

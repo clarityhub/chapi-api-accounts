@@ -1,0 +1,39 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "Get an Organization",
+    "required": [
+        "organizationName"
+    ],
+    "properties": {
+        "items": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "organizationId": {
+                        "type": "string",
+                        "title": "Organization Id"
+                    },
+                    "organizationName": {
+                        "type": "string",
+                        "title": "Organization Name"
+                    },
+                    "creatorUserId": {
+                        "type": "string",
+                        "title": "Creator User Id"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "title": "Created At"
+                    },
+                    "modifiedAt": {
+                        "type": "string",
+                        "title": "Modified At"
+                    }
+                }
+            }   
+        }
+    }
+}
